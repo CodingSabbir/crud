@@ -19,17 +19,39 @@ export default function Tasker() {
         
     };
 
-    const handleAddUser = (user) => {
-        console.log(user);
-    };
+    
     // State to hold tasks
     const [tasks, setTasks] = useState([defaultTasks]);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [taskToUpdate, setTaskToUpdate] = useState(null);
 
+
+    const handleAddUser = (user,isAdd) => {
+        if(isAdd){
+            setTasks([...tasks, user])
+        }else{
+            setTasks(
+                tasks.map((task)=>{
+                    if(task.id === user.id){
+                        return user
+                    }
+                    return task
+                })
+            )
+        }
+        
+        setShowAddModal(false)
+    };
+
+    const handleEditTask = (user) => {
+        setTaskToUpdate(user); // Set the task to be updated
+        setShowAddModal(true); // Open modal
+    };
+ 
     return (
         <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
-            {showAddModal && <AddTaskModal onSave={handleAddUser}/>}
-            <AddTaskButtonSection onAddClick={() => setShowAddModal(true)} />
+            {showAddModal && <AddTaskModal onSave={handleAddUser} taskToUpdate={taskToUpdate}/>}
+            <AddTaskButtonSection onAddClick={() => setShowAddModal(true)}  />
             <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
                 <table className="w-full table-auto text-sm text-left">
                     <thead className="bg-gray-50 text-gray-600 font-medium border-b">
@@ -53,10 +75,12 @@ export default function Tasker() {
                                     {item.salary.join(',')}
                                 </td>
                                 <td className="text-right px-6 whitespace-nowrap">
-                                    <a href="#" className="py-2 px-3 font-medium text-indigo-600 hover:text-indigo-500 duration-150 hover:bg-gray-50 rounded-lg">
+                                    <a 
+                                    onClick={() => handleEditTask(item)}
+                                     href="#" className="py-2 px-3 font-medium text-indigo-600 hover:text-indigo-500 duration-150 hover:bg-gray-50 rounded-lg">
                                         Edit
                                     </a>
-                                    <button className="py-2 leading-none px-3 font-medium text-red-600 hover:text-red-500 duration-150 hover:bg-gray-50 rounded-lg">
+                                    <button  className="py-2 leading-none px-3 font-medium text-red-600 hover:text-red-500 duration-150 hover:bg-gray-50 rounded-lg">
                                         Delete
                                     </button>
                                 </td>
