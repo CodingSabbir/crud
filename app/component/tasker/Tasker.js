@@ -6,6 +6,7 @@ import { useState } from "react";
 import AddTaskButtonSection from "../AddTaskButtonSection";
 import { FiHeart } from 'react-icons/fi';
 import AddTaskModal from "../AddTaskModal";
+import Search from "../Search";
 
 export default function Tasker() {
     // Default task data
@@ -47,11 +48,38 @@ export default function Tasker() {
         setTaskToUpdate(user); // Set the task to be updated
         setShowAddModal(true); // Open modal
     };
+    
+    const handleDeleteTask = (userId) => {
+        setTasks(tasks.filter((task) => task.id!== userId));
+     
+    };
+
+    function handleCloseClick (){
+        setShowAddModal(false);
+        setTaskToUpdate(null);
+    }
+    function handleDeleteAllMember(){
+        tasks.length= 0;
+        setTasks([...tasks]);
+    }
+
+    function handleOnFav(id){
+        setTasks(tasks.map((task)=>{
+            if(task.id === id){
+                task.isFavorite =!task.isFavorite;
+            }
+            return task
+        }))
+    }
  
+    function handleClickSearch(searchText){
+        setTasks(tasks.filter((task) => task.name.toLowerCase().includes(searchText.toLowerCase())));
+    }
     return (
         <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
-            {showAddModal && <AddTaskModal onSave={handleAddUser} taskToUpdate={taskToUpdate}/>}
-            <AddTaskButtonSection onAddClick={() => setShowAddModal(true)}  />
+            {showAddModal && <AddTaskModal onSave={handleAddUser} taskToUpdate={taskToUpdate} onCloseClick={handleCloseClick}/>}
+            <AddTaskButtonSection tasks={tasks} onAddClick={() => setShowAddModal(true)}  deleteAllMemberClick={handleDeleteAllMember}/>
+                <Search onSearch={handleClickSearch}/>
             <div className="mt-12 shadow-sm border rounded-lg overflow-x-auto">
                 <table className="w-full table-auto text-sm text-left">
                     <thead className="bg-gray-50 text-gray-600 font-medium border-b">
@@ -67,7 +95,9 @@ export default function Tasker() {
                         {tasks.map((item, id) => (
                             <tr key={id}>
                                 <td className="px-6 py-4 whitespace-nowrap flex gap-2 items-center">
+                                    <button className="flex items-center gap-3" onClick={()=>handleOnFav(item.id)}>
                                     {item.isFavorite ? <FiHeart className="text-red-500 cursor-pointer" /> : <FiHeart className="text-gray-400 cursor-pointer" />} {item.name}
+                                    </button>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">{item.position}</td>
@@ -80,7 +110,9 @@ export default function Tasker() {
                                      href="#" className="py-2 px-3 font-medium text-indigo-600 hover:text-indigo-500 duration-150 hover:bg-gray-50 rounded-lg">
                                         Edit
                                     </a>
-                                    <button  className="py-2 leading-none px-3 font-medium text-red-600 hover:text-red-500 duration-150 hover:bg-gray-50 rounded-lg">
+                                    <button 
+                                     onClick={() => handleDeleteTask(item.id)}
+                                     className="py-2 leading-none px-3 font-medium text-red-600 hover:text-red-500 duration-150 hover:bg-gray-50 rounded-lg">
                                         Delete
                                     </button>
                                 </td>
